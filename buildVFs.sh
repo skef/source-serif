@@ -21,9 +21,17 @@ function build_var_font {
 	# build variable OTF
 	# --mkot gs is for using the makeotf option -gs, which omits glyphs not in the GOADB
 	buildmasterotfs --mkot gs -d $1/$2.designspace
+
+    # Split combined private dicts into FDArrays
+	echo 'Splitting combined dict into FDArray'
+	splitpsdicts -m $1/vf_hinting_metadata.plist -d $1/$2.designspace
+
 	# -k writes post table v2
 	# buildcff2vf -k --omit-mac-names -d $1/$2.designspace
 	buildcff2vf --omit-mac-names -d $1/$2.designspace
+
+	echo 'Hinting' $2.otf
+    psautohint --no-flex $1/$2.otf
 
 	# extract and subroutinize the CFF2 table
 	echo 'Subroutinizing' $2.otf
